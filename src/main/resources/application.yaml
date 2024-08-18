@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: eeg4asd
+  mvc:
+    throw-exception-if-no-handler-found: true
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+  web:
+    resources:
+      add-mappings: false
+  rabbitmq:
+    queues:
+      request: TAS-NET--sy
+      response: res_TAS-NET--sy
+server:
+  tomcat:
+    max-swallow-size: -1
+
+jwt:
+  expiration: 86400
