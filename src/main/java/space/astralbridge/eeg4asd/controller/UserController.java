@@ -19,6 +19,7 @@ import space.astralbridge.eeg4asd.dto.request.GetUserRequestDTO;
 import space.astralbridge.eeg4asd.dto.request.PostUserParentRequestDTO;
 import space.astralbridge.eeg4asd.dto.request.PostUserRoleRequestDTO;
 import space.astralbridge.eeg4asd.dto.response.GetUserResponseDTO;
+import space.astralbridge.eeg4asd.model.User;
 import space.astralbridge.eeg4asd.service.bussine.UserService;
 
 @RestController
@@ -29,33 +30,33 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/{uid}")
-    public GetUserResponseDTO handleUserGet(@PathVariable("uid") String uid) {
+    public GetUserResponseDTO handleUserGet(@PathVariable("uid") String uid, HttpServletRequest request) {
         GetUserRequestDTO requestDTO = new GetUserRequestDTO(uid);
-        return userService.getUserBasicInfo(requestDTO);
+        return userService.getUserBasicInfo(requestDTO, (User) request.getAttribute("authUser"));
     }
 
     @GetMapping
     public GetUserResponseDTO handleUserDefaultGet(HttpServletRequest request) {
-        return userService.getUserInfo(new GetUserRequestDTO(request.getAttribute("uid").toString()));
+        return userService.getDefaultUserInfo((User) request.getAttribute("authUser"));
     }
 
     @PostMapping("/role")
     public void handleUserRolePost(@Valid @RequestBody PostUserRoleRequestDTO requestDTO,
             HttpServletRequest request) {
 
-        userService.setUserRole(requestDTO, request);
+        userService.setUserRole(requestDTO, (User) request.getAttribute("authUser"));
         return;
     }
 
     @PostMapping("/parent")
     public void handleUserParentPost(@Valid @RequestBody PostUserParentRequestDTO requestDTO,
             HttpServletRequest request) {
-        userService.setParent(requestDTO, request);
+        userService.setParent(requestDTO, (User) request.getAttribute("authUser"));
         return;
     }
 
     @GetMapping("/children")
     public List<UserBasicInfo> handleUserChildGet(HttpServletRequest request) {
-        return userService.getChildrenList(request);
+        return userService.getChildrenList((User) request.getAttribute("authUser"));
     }
 }

@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.http.HttpServletRequest;
 import space.astralbridge.eeg4asd.model.Task;
 import space.astralbridge.eeg4asd.model.User;
 import space.astralbridge.eeg4asd.repository.TaskRepository;
@@ -20,8 +19,7 @@ public class TasksService {
     @Autowired
     private UserRepository userRepository;
 
-    public List<Task> getAllTasks(HttpServletRequest request) {
-        User user = userRepository.findBy_id(request.getAttribute("uid").toString());
+    public List<Task> getAllTasks(User user) {
         if ("b".equals(user.getRole())) {
             List<User> patients = userRepository.findByParentId(user.get_id());
             List<String> patientIDs = patients.stream().map(User::get_id).collect(Collectors.toList());

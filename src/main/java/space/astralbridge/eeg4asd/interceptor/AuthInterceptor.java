@@ -12,6 +12,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import space.astralbridge.eeg4asd.interceptor.exception.AuthInvalidTokenException;
 import space.astralbridge.eeg4asd.interceptor.exception.AuthMissingTokenException;
+import space.astralbridge.eeg4asd.model.User;
+import space.astralbridge.eeg4asd.repository.UserRepository;
 import space.astralbridge.eeg4asd.service.common.JwtManagementService;
 
 @Component
@@ -19,6 +21,7 @@ import space.astralbridge.eeg4asd.service.common.JwtManagementService;
 @Slf4j
 public class AuthInterceptor implements HandlerInterceptor {
     private final JwtManagementService jwtManagementService;
+    private final UserRepository userRepository;
 
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
             @NonNull Object handler)
@@ -31,7 +34,10 @@ public class AuthInterceptor implements HandlerInterceptor {
         } else {
             try {
                 String uid = jwtManagementService.verifyToken(token);
-                request.setAttribute("uid", uid);
+
+                User authUser = userRepository.findBy_id(uid);
+                request.setAttribute("authUser", authUser);
+
             } catch (JWTVerificationException e) {
                 log.warn(e.getMessage());
                 e.printStackTrace();

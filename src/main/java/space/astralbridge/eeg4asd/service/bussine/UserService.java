@@ -1,13 +1,11 @@
 package space.astralbridge.eeg4asd.service.bussine;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import space.astralbridge.eeg4asd.dto.common.UserBasicInfo;
 import space.astralbridge.eeg4asd.dto.request.GetUserRequestDTO;
@@ -22,9 +20,18 @@ import space.astralbridge.eeg4asd.repository.UserRepository;
 public class UserService {
     private final UserRepository userRepository;
 
-    public GetUserResponseDTO getUserBasicInfo(GetUserRequestDTO requestDTO) {
-        User user = userRepository.findBy_id(requestDTO.getId());
-        return new GetUserResponseDTO(user.getUsername(), user.getRole(), null);
+    public GetUserResponseDTO getUserBasicInfo(GetUserRequestDTO requestDTO, User authUser) {
+        String role = authUser.getRole();
+        if ("a".equals(role) || "b".equals(role) || authUser.get_id().equals(requestDTO.getId())) {
+            User user = userRepository.findBy_id(requestDTO.getId());
+            return new GetUserResponseDTO(user.getUsername(), user.getRole(), user.getParentId());
+        } else {
+            throw new IllegalArgumentException("Permission denied");
+        }
+    }
+
+    public GetUserResponseDTO getDefaultUserInfo(User user) {
+        return new GetUserResponseDTO(user.getUsername(), user.getRole(), user.getParentId());
     }
 
     public GetUserResponseDTO getUserInfo(GetUserRequestDTO requestDTO) {
@@ -32,21 +39,33 @@ public class UserService {
         return new GetUserResponseDTO(user.getUsername(), user.getRole(), user.getParentId());
     }
 
-    public void setUserRole(PostUserRoleRequestDTO requestDTO, HttpServletRequest request) {
-        User user = userRepository
-                .findBy_id(Optional.ofNullable(request.getAttribute("uid")).orElseThrow().toString());
-        if (user.getRole() == null) {
-            user.setRole(requestDTO.getRole());
-            userRepository.save(user);
+    public void setUserRole(PostUserRoleRequestDTO requestDTO, User authUser) {
+        if (requestDTO.getId() == null || requestDTO.getId().isBlank()) {
+            requestDTO.setId(authUser.get_id());
+        }
+        User user = userRepository.findBy_id(requestDTO.getId());
+
+        if (user.getRole() == null || user.getRole().isBlank() || "undefined".equals(user.getRole())
+                || authUser.getRole().equals("a")) {
+            if (!authUser.getRole().equals("a") && requestDTO.getRole().equals("a")) {
+                throw new IllegalArgumentException("Permission denied");
+            } else {
+                user.setRole(requestDTO.getRole());
+                userRepository.save(user);
+            }
         } else {
             throw new IllegalArgumentException("User role already set");
         }
         return;
     }
 
-    public void setParent(PostUserParentRequestDTO requestDTO, HttpServletRequest request) {
-        User user = userRepository
-                .findBy_id(Optional.ofNullable(request.getAttribute("uid")).orElseThrow().toString());
+    public void setParent(PostUserParentRequestDTO requestDTO, User authUser) {
+        if (requestDTO.getId() == null) {
+            requestDTO.setId(authUser.get_id());
+        }
+
+        User user = userRepository.findBy_id(requestDTO.getId());
+
         if (user.getParentId() != null) {
             throw new IllegalArgumentException("User parent already set");
         } else if (user.getRole() == null) {
@@ -67,19 +86,16 @@ public class UserService {
         return;
     }
 
-    public List<UserBasicInfo> getChildrenList(HttpServletRequest request) {
-        User user = userRepository
-                .findBy_id(Optional.ofNullable(request.getAttribute("uid")).orElseThrow().toString());
-        if (user.getRole() == null) {
+    public List<UserBasicInfo> getChildrenList(User authUser) {
+        if (authUser.getRole() == null || authUser.getRole().isBlank() || "undefined".equals(authUser.getRole())) {
             throw new IllegalArgumentException("User role not set");
-        } else if (!"b".equals(user.getRole())) {
+        } else if (!"b".equals(authUser.getRole())) {
             throw new IllegalArgumentException("Only businesses can have children");
         } else {
-            return userRepository.findByParentId(user.get_id())
+            return userRepository.findByParentId(authUser.get_id())
                     .stream()
                     .map(UserBasicInfo::new)
                     .collect(Collectors.toList());
-
         }
     }
 

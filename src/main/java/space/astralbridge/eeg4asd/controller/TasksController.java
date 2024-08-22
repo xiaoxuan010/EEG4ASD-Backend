@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
 import space.astralbridge.eeg4asd.model.Task;
+import space.astralbridge.eeg4asd.model.User;
 import space.astralbridge.eeg4asd.service.bussine.TasksService;
 
 @RestController
@@ -19,6 +20,6 @@ public class TasksController {
 
     @GetMapping
     public List<Task> getTasks(HttpServletRequest request) {
-        return tasksService.getAllTasks(request);
+        return tasksService.getAllTasks((User) request.getAttribute("authUser"));
     }
 }
