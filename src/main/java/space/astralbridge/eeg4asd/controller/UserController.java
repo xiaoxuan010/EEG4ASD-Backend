@@ -48,6 +48,13 @@ public class UserController {
         return;
     }
 
+    @PostMapping("/{uid}/role")
+    public void handleUserRolePost(@PathVariable("uid") String uid,
+            @Valid @RequestBody PostUserRoleRequestDTO requestDTO,
+            HttpServletRequest request) {
+
+    }
+
     @PostMapping("/parent")
     public void handleUserParentPost(@Valid @RequestBody PostUserParentRequestDTO requestDTO,
             HttpServletRequest request) {

@@ -14,15 +14,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import space.astralbridge.eeg4asd.dto.common.JwtPayload;
 import space.astralbridge.eeg4asd.dto.request.UserLoginPostRequestDTO;
+import space.astralbridge.eeg4asd.dto.request.UserRegisterPostRequestDTO;
 import space.astralbridge.eeg4asd.dto.response.UserLoginPostResponseDTO;
+import space.astralbridge.eeg4asd.dto.response.UserRegisterPostResponseDTO;
 import space.astralbridge.eeg4asd.dto.response.UserVerifyPostResponseDTO;
 import space.astralbridge.eeg4asd.model.User;
 import space.astralbridge.eeg4asd.repository.UserRepository;
 import space.astralbridge.eeg4asd.service.common.JwtManagementService;
 import space.astralbridge.eeg4asd.service.common.KeyManagementService;
+import space.astralbridge.eeg4asd.service.common.UserManagementService;
 import space.astralbridge.eeg4asd.service.exception.UserLoginUserNotExistException;
 import space.astralbridge.eeg4asd.service.exception.UserLoginUserOrPwdErrorException;
-import space.astralbridge.eeg4asd.service.exception.UserRegisterUsernameExistsException;
 
 @Service
 @Slf4j
@@ -34,29 +36,17 @@ public class UserAuthService {
 
     private final JwtManagementService jwtManagementService;
 
-    public User createUser(String username, String password)
+    private final UserManagementService userManagementService;
+
+    public UserRegisterPostResponseDTO registerUser(UserRegisterPostRequestDTO reqDTO)
             throws InvalidKeyException, NoSuchAlgorithmException {
+        User newUser = userManagementService.createUser(reqDTO.getUsername(), reqDTO.getPwd());
 
-        log.info("用户 {} 注册", username);
-
-        if (!isUsernameValid(username)) {
-            throw new UserRegisterUsernameExistsException(username);
-        }
-
-        User user = new User();
-        user.setUsername(username);
-
-        SecretKey secretKey = keyManagementService.generateHmacKey();
-        user.setPwdSecretKey(secretKey.getEncoded());
-        user.setPassword(keyManagementService.HmacSHA256(password, secretKey));
-
-        userRepository.save(user);
-
-        return user;
+        return new UserRegisterPostResponseDTO(newUser.get_id());
     }
 
     public UserVerifyPostResponseDTO verifyUsername(String username) {
-        return new UserVerifyPostResponseDTO(isUsernameValid(username));
+        return new UserVerifyPostResponseDTO(userManagementService.isUsernameValid(username));
     }
 
     public UserLoginPostResponseDTO Login(UserLoginPostRequestDTO requestDTO)
@@ -72,11 +62,7 @@ public class UserAuthService {
         }
 
     }
-
-    private boolean isUsernameValid(String username) {
-        return userRepository.findByUsername(username) == null;
-    }
-
+  
     private String userPwdAuth(String inputUserName, String inputPwd)
             throws InvalidKeyException, NoSuchAlgorithmException {
         User user = userRepository.findByUsername(inputUserName);

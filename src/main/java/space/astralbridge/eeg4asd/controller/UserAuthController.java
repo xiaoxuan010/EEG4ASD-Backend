@@ -34,8 +34,7 @@ public class UserAuthController {
     public UserRegisterPostResponseDTO handleUserRegisterPost(
             @RequestBody @Valid UserRegisterPostRequestDTO requestDTO)
             throws InvalidKeyException, NoSuchAlgorithmException {
-        return new UserRegisterPostResponseDTO(
-                userService.createUser(requestDTO.getUsername(), requestDTO.getPwd()).get_id());
+        return userService.registerUser(requestDTO);
     }
 
     @PostMapping("/login")
