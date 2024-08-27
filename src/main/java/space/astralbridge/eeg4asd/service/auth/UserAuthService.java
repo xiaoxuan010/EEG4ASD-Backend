@@ -40,7 +40,7 @@ public class UserAuthService {
 
     public UserRegisterPostResponseDTO registerUser(UserRegisterPostRequestDTO reqDTO)
             throws InvalidKeyException, NoSuchAlgorithmException {
-        User newUser = userManagementService.createUser(reqDTO.getUsername(), reqDTO.getPwd());
+        User newUser = userManagementService.createUser(reqDTO.getUsername(), reqDTO.getPwd(), reqDTO.getRole());
 
         return new UserRegisterPostResponseDTO(newUser.get_id());
     }
@@ -62,7 +62,7 @@ public class UserAuthService {
         }
 
     }
-  
+
     private String userPwdAuth(String inputUserName, String inputPwd)
             throws InvalidKeyException, NoSuchAlgorithmException {
         User user = userRepository.findByUsername(inputUserName);

@@ -24,7 +24,8 @@ public class UserManagementService {
         return userRepository.findByUsername(username) == null;
     }
 
-    public User createUser(String username, String password) throws NoSuchAlgorithmException, InvalidKeyException {
+    public User createUser(String username, String password, String role)
+            throws NoSuchAlgorithmException, InvalidKeyException {
         if (!isUsernameValid(username)) {
             throw new UserRegisterUsernameExistsException(username);
         }
@@ -37,12 +38,10 @@ public class UserManagementService {
         user.setUsername(username);
         user.setPwdSecretKey(pwdSecretKey);
         user.setPassword(pwdHash);
-        user.setRole("undefined");
+        user.setRole(role);
 
         userRepository.save(user);
         return user;
     }
-
-    
 
 }
