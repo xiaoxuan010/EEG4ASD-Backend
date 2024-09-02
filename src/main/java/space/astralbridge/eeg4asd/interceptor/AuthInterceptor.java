@@ -36,6 +36,11 @@ public class AuthInterceptor implements HandlerInterceptor {
                 String uid = jwtManagementService.verifyToken(token);
 
                 User authUser = userRepository.findBy_id(uid);
+
+                if (authUser == null) {
+                    throw new AuthInvalidTokenException();
+                }
+
                 request.setAttribute("authUser", authUser);
 
             } catch (JWTVerificationException e) {

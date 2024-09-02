@@ -22,8 +22,9 @@ public class UserService {
 
     public GetUserResponseDTO getUserBasicInfo(GetUserRequestDTO requestDTO, User authUser) {
         String role = authUser.getRole();
-        if ("a".equals(role) || "b".equals(role) || authUser.get_id().equals(requestDTO.getId())) {
-            User user = userRepository.findBy_id(requestDTO.getId());
+        User user = userRepository.findBy_id(requestDTO.getId());
+        if ("b".equals(user.getRole()) || "a".equals(role) || "b".equals(role)
+                || authUser.get_id().equals(requestDTO.getId())) {
             return new GetUserResponseDTO(user.getUsername(), user.getRole(), user.getParentId());
         } else {
             throw new IllegalArgumentException("Permission denied");
@@ -47,7 +48,7 @@ public class UserService {
 
         if (user.getRole() == null || user.getRole().isBlank() || "undefined".equals(user.getRole())
                 || authUser.getRole().equals("a")) {
-            if (!authUser.getRole().equals("a") && requestDTO.getRole().equals("a")) {
+            if (!"a".equals(authUser.getRole()) && "a".equals(requestDTO.getRole())) {
                 throw new IllegalArgumentException("Permission denied");
             } else {
                 user.setRole(requestDTO.getRole());
