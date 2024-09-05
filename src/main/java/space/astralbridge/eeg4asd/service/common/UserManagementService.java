@@ -44,4 +44,15 @@ public class UserManagementService {
         return user;
     }
 
+    public void changePassword(User user, String newPassword) throws NoSuchAlgorithmException, InvalidKeyException {
+        SecretKey secretKey = keyManagementService.generateHmacKey();
+        byte[] pwdSecretKey = secretKey.getEncoded();
+        byte[] pwdHash = keyManagementService.HmacSHA256(newPassword, secretKey);
+
+        user.setPwdSecretKey(pwdSecretKey);
+        user.setPassword(pwdHash);
+
+        userRepository.save(user);
+    }
+
 }

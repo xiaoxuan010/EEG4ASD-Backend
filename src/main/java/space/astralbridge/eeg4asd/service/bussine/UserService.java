@@ -1,5 +1,7 @@
 package space.astralbridge.eeg4asd.service.bussine;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,18 +13,28 @@ import space.astralbridge.eeg4asd.dto.common.UserBasicInfo;
 import space.astralbridge.eeg4asd.dto.request.GetUserRequestDTO;
 import space.astralbridge.eeg4asd.dto.request.PostUserParentRequestDTO;
 import space.astralbridge.eeg4asd.dto.request.PostUserRoleRequestDTO;
+import space.astralbridge.eeg4asd.dto.request.UserChangePasswordPostRequestDTO;
 import space.astralbridge.eeg4asd.dto.response.GetUserResponseDTO;
 import space.astralbridge.eeg4asd.model.User;
 import space.astralbridge.eeg4asd.repository.UserRepository;
+import space.astralbridge.eeg4asd.service.auth.UserAuthService;
+import space.astralbridge.eeg4asd.service.common.UserManagementService;
+import space.astralbridge.eeg4asd.service.exception.UserLoginUserNotExistException;
+import space.astralbridge.eeg4asd.service.exception.UserLoginUserOrPwdErrorException;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserService {
     private final UserRepository userRepository;
+    private final UserAuthService userAuthService;
+    private final UserManagementService userManagementService;
 
     public GetUserResponseDTO getUserBasicInfo(GetUserRequestDTO requestDTO, User authUser) {
         String role = authUser.getRole();
         User user = userRepository.findBy_id(requestDTO.getId());
+        if (user == null) {
+            throw new IllegalArgumentException("User not found");
+        }
         if ("b".equals(user.getRole()) || "a".equals(role) || "b".equals(role)
                 || authUser.get_id().equals(requestDTO.getId())) {
             return new GetUserResponseDTO(user.getUsername(), user.getRole(), user.getParentId());
@@ -98,6 +110,24 @@ public class UserService {
                     .map(UserBasicInfo::new)
                     .collect(Collectors.toList());
         }
+    }
+
+    public void changePassword(UserChangePasswordPostRequestDTO requestDTO, User authUser)
+            throws InvalidKeyException, NoSuchAlgorithmException {
+        String uid = authUser.get_id();
+        String oldPwd = requestDTO.getOldPwd();
+        String newPwd = requestDTO.getNewPwd();
+
+        User user = userRepository.findBy_id(uid);
+        if (user == null) {
+            throw new UserLoginUserNotExistException(uid);
+        }
+
+        if (userAuthService.userPwdAuth(user.getUsername(), oldPwd) == null) {
+            throw new UserLoginUserOrPwdErrorException();
+        }
+
+        userManagementService.changePassword(user, newPwd);
     }
 
 }

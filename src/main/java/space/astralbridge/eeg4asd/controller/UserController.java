@@ -1,5 +1,7 @@
 package space.astralbridge.eeg4asd.controller;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import space.astralbridge.eeg4asd.dto.common.UserBasicInfo;
 import space.astralbridge.eeg4asd.dto.request.GetUserRequestDTO;
 import space.astralbridge.eeg4asd.dto.request.PostUserParentRequestDTO;
 import space.astralbridge.eeg4asd.dto.request.PostUserRoleRequestDTO;
+import space.astralbridge.eeg4asd.dto.request.UserChangePasswordPostRequestDTO;
 import space.astralbridge.eeg4asd.dto.response.GetUserResponseDTO;
 import space.astralbridge.eeg4asd.model.User;
 import space.astralbridge.eeg4asd.service.bussine.UserService;
@@ -65,5 +68,13 @@ public class UserController {
     @GetMapping("/children")
     public List<UserBasicInfo> handleUserChildGet(HttpServletRequest request) {
         return userService.getChildrenList((User) request.getAttribute("authUser"));
+    }
+
+    @PostMapping("/changePwd")
+    public void handleChangePwdPost(@RequestBody @Valid UserChangePasswordPostRequestDTO requestDTO,
+            HttpServletRequest request)
+            throws InvalidKeyException, NoSuchAlgorithmException {
+        userService.changePassword(requestDTO, (User) request.getAttribute("authUser"));
+        return;
     }
 }

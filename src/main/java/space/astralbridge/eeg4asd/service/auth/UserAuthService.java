@@ -63,7 +63,7 @@ public class UserAuthService {
 
     }
 
-    private String userPwdAuth(String inputUserName, String inputPwd)
+    public String userPwdAuth(String inputUserName, String inputPwd)
             throws InvalidKeyException, NoSuchAlgorithmException {
         User user = userRepository.findByUsername(inputUserName);
         if (user == null) {
