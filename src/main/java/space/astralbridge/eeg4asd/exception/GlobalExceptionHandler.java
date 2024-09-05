@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,8 +21,7 @@ import space.astralbridge.eeg4asd.dto.response.BasicResponseStandard;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-
-    public ResponseEntity<BasicResponseStandard<Map<String, String>>> handleValidationExceptions(
+    public BasicResponseStandard<Map<String, String>> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
 
         Map<String, String> errors = new HashMap<>();
@@ -32,55 +31,40 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMsg);
         });
 
-        log.info("Validation Error: {}", errors);
-
-        return new ResponseEntity<>(new BasicResponseStandard<>(429, "Validation Error", errors),
-                HttpStatus.BAD_REQUEST);
-
+        return new BasicResponseStandard<>(HttpStatus.BAD_REQUEST, errors);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public BasicResponseStandard<Void> handleHttpRequestMethodNotSupported(HttpRequestMethodNotSupportedException e) {
-        log.info("Method Not Allowed: {}", e.getMessage());
-
-        return new BasicResponseStandard<>(405, "Method Not Allowed", null);
+        return new BasicResponseStandard<>(HttpStatus.METHOD_NOT_ALLOWED, null);
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public BasicResponseStandard<Void> handleNoHandlerFoundException(NoHandlerFoundException e) {
-        log.info("Not Found: {}", e.getMessage());
-
-        return new BasicResponseStandard<>(404, "Not Found", null);
+        return new BasicResponseStandard<>(HttpStatus.NOT_FOUND, null);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public BasicResponseStandard<Void> handleIllegalArgumentException(IllegalArgumentException e) {
-        log.info("Bad Request: {}", e.getMessage());
-
         return new BasicResponseStandard<>(400, "Bad Request: " + e.getMessage(), null);
     }
 
     @ExceptionHandler(NoSuchElementException.class)
     public BasicResponseStandard<String> handleNoSuchElementException(NoSuchElementException e) {
-        log.info("Not Found: {}", e.getMessage());
-
-        return new BasicResponseStandard<>(404, "Not Found", e.getMessage());
+        return new BasicResponseStandard<>(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
-    // @ExceptionHandler(HttpMediaTypeException.class)
-    // public BasicResponseStandard<Void>
-    // handleHttpMediaTypeNotSupportedException(HttpMediaTypeException e) {
-    // log.info("Media Type Exception: {}", e.getMessage());
-
-    // return new BasicResponseStandard<>(415, "Unsupported Media Type", null);
-    // }
+    @ExceptionHandler(HttpMediaTypeException.class)
+    public BasicResponseStandard<Void> handleHttpMediaTypeNotSupportedException(HttpMediaTypeException e) {
+        return new BasicResponseStandard<>(HttpStatus.UNSUPPORTED_MEDIA_TYPE, null);
+    }
 
     @ExceptionHandler(Exception.class)
     public BasicResponseStandard<Void> handleException(Exception e) {
         e.printStackTrace();
         log.error("Internal Server Error: [{}]{}", e.getClass(), e.getMessage());
 
-        return new BasicResponseStandard<>(500, "Internal Server Error", null);
+        return new BasicResponseStandard<>(HttpStatus.INTERNAL_SERVER_ERROR, null);
     }
 
 }

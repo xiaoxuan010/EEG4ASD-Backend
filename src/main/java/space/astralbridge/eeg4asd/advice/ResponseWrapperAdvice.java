@@ -2,8 +2,6 @@ package space.astralbridge.eeg4asd.advice;
 
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -14,13 +12,12 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import lombok.extern.slf4j.Slf4j;
 import space.astralbridge.eeg4asd.dto.response.BasicResponseStandard;
 
 @ControllerAdvice
+@Slf4j
 public class ResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
-
-    private Logger logger = LoggerFactory.getLogger(getClass());
-
     @Override
     public boolean supports(@NonNull MethodParameter returnType,
             @NonNull Class<? extends HttpMessageConverter<?>> converterType) {
@@ -33,7 +30,7 @@ public class ResponseWrapperAdvice implements ResponseBodyAdvice<Object> {
             @NonNull Class<? extends HttpMessageConverter<?>> selectedConverterType,
             @NonNull ServerHttpRequest request, @NonNull ServerHttpResponse response) {
 
-        logger.info("Wrapping response: {}", Optional.ofNullable(body).map(val -> val.getClass()).orElse(null));
+        log.info("Wrapping response: \n{}", Optional.ofNullable(body).map(val -> val.getClass()).orElse(null));
 
         if (body instanceof BasicResponseStandard) {
             return body;
