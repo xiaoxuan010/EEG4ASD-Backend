@@ -25,4 +25,8 @@ public class User {
     @Field(targetType = FieldType.OBJECT_ID)
     private String parentId;
 
+    String legalName;
+
+    String phoneNumber;
+
 }

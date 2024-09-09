@@ -37,19 +37,22 @@ public class UserService {
         }
         if ("b".equals(user.getRole()) || "a".equals(role) || "b".equals(role)
                 || authUser.get_id().equals(requestDTO.getId())) {
-            return new GetUserResponseDTO(user.getUsername(), user.getRole(), user.getParentId());
+            return new GetUserResponseDTO(user.getUsername(), user.getRole(), user.getParentId(), user.getLegalName(),
+                    user.getPhoneNumber());
         } else {
             throw new IllegalArgumentException("Permission denied");
         }
     }
 
     public GetUserResponseDTO getDefaultUserInfo(User user) {
-        return new GetUserResponseDTO(user.getUsername(), user.getRole(), user.getParentId());
+        return new GetUserResponseDTO(user.getUsername(), user.getRole(), user.getParentId(), user.getLegalName(),
+                user.getPhoneNumber());
     }
 
     public GetUserResponseDTO getUserInfo(GetUserRequestDTO requestDTO) {
         User user = userRepository.findBy_id(requestDTO.getId());
-        return new GetUserResponseDTO(user.getUsername(), user.getRole(), user.getParentId());
+        return new GetUserResponseDTO(user.getUsername(), user.getRole(), user.getParentId(), user.getLegalName(),
+                user.getPhoneNumber());
     }
 
     public void setUserRole(PostUserRoleRequestDTO requestDTO, User authUser) {

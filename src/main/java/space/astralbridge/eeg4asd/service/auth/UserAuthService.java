@@ -40,7 +40,8 @@ public class UserAuthService {
 
     public UserRegisterPostResponseDTO registerUser(UserRegisterPostRequestDTO reqDTO)
             throws InvalidKeyException, NoSuchAlgorithmException {
-        User newUser = userManagementService.createUser(reqDTO.getUsername(), reqDTO.getPwd(), reqDTO.getRole());
+        User newUser = userManagementService.createUser(reqDTO.getUsername(), reqDTO.getPwd(), reqDTO.getRole(),
+                reqDTO.getLegalName(), reqDTO.getPhoneNumber());
 
         return new UserRegisterPostResponseDTO(newUser.get_id());
     }

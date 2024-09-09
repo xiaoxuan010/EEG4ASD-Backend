@@ -14,4 +14,10 @@ public class UserRegisterPostRequestDTO {
 
     @Nullable
     private String role;
+
+    @NotNull
+    private String legalName;
+
+    @NotNull
+    private String phoneNumber;
 }

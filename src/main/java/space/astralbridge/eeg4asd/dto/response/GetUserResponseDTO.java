@@ -6,6 +6,7 @@ import lombok.Data;
 public class GetUserResponseDTO {
     private final String username;
     private final String role;
-
     private final String parentId;
+    private final String legalName;
+    private final String phoneNumber;
 }
