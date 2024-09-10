@@ -9,17 +9,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import space.astralbridge.eeg4asd.dto.request.UserChangePasswordPostRequestDTO;
 import space.astralbridge.eeg4asd.dto.request.UserLoginPostRequestDTO;
 import space.astralbridge.eeg4asd.dto.request.UserRegisterPostRequestDTO;
 import space.astralbridge.eeg4asd.dto.request.UserVerifyPostRequestDTO;
 import space.astralbridge.eeg4asd.dto.response.UserLoginPostResponseDTO;
 import space.astralbridge.eeg4asd.dto.response.UserRegisterPostResponseDTO;
 import space.astralbridge.eeg4asd.dto.response.UserVerifyPostResponseDTO;
-import space.astralbridge.eeg4asd.model.User;
 import space.astralbridge.eeg4asd.service.auth.UserAuthService;
 
 @RestController
