@@ -15,4 +15,6 @@ public class GetTaskRequestDTO {
     boolean result;
 
     boolean patientID;
+
+    boolean llmResult;
 }

@@ -79,6 +79,9 @@ public class TaskService {
         if (requestDTO.isResult())
             resDTO.setResult(task.getResult());
 
+        if (requestDTO.isLlmResult())
+            resDTO.setLlmResult(task.getLlmResult());
+
         return resDTO;
 
     }

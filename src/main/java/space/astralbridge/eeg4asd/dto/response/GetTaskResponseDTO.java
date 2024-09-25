@@ -13,4 +13,6 @@ public class GetTaskResponseDTO {
     private String state;
 
     private String result;
+
+    private String llmResult;
 }

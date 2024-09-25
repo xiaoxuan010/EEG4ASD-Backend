@@ -25,4 +25,6 @@ public class Task {
     @Field(targetType = FieldType.OBJECT_ID)
     private String patientID;
 
+    private String llmResult;
+
 }
